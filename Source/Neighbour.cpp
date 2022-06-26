@@ -41,9 +41,12 @@ inline void Domain::CellInitiate () {
 
 
 	//Because of Hexagonal close packing in x direction domain is modified
-	if (!BC.Periodic[0]) {TRPR(0) += hmax/2;	BLPF(0) -= hmax/2;}else{TRPR(0) += R; BLPF(0) -= R;}
-	if (!BC.Periodic[1]) {TRPR(1) += hmax/2;	BLPF(1) -= hmax/2;}else{TRPR(1) += R; BLPF(1) -= R;}
-	if (!BC.Periodic[2]) {TRPR(2) += hmax/2;	BLPF(2) -= hmax/2;}else{TRPR(2) += R; BLPF(2) -= R;}
+	//if (!BC.Periodic[0]) 
+  {TRPR(0) += hmax/2;	BLPF(0) -= hmax/2;}else{TRPR(0) += R; BLPF(0) -= R;}
+	//if (!BC.Periodic[1]) 
+  {TRPR(1) += hmax/2;	BLPF(1) -= hmax/2;}else{TRPR(1) += R; BLPF(1) -= R;}
+	//if (!BC.Periodic[2]) 
+  {TRPR(2) += hmax/2;	BLPF(2) -= hmax/2;}else{TRPR(2) += R; BLPF(2) -= R;}
 
     // Calculate Cells Properties
 	switch (Dimension)
@@ -89,13 +92,13 @@ inline void Domain::CellInitiate () {
 	}
 
 	// Periodic BC modifications
-	if (BC.Periodic[0]) CellNo[0] += 2;
-    if (BC.Periodic[1]) CellNo[1] += 2;
-    if (BC.Periodic[2]) CellNo[2] += 2;
+	// if (BC.Periodic[0]) CellNo[0] += 2;
+    // if (BC.Periodic[1]) CellNo[1] += 2;
+    // if (BC.Periodic[2]) CellNo[2] += 2;
 
-    if (BC.Periodic[0]) DomSize[0] = (TRPR(0)-BLPF(0));
-    if (BC.Periodic[1]) DomSize[1] = (TRPR(1)-BLPF(1));
-    if (BC.Periodic[2]) DomSize[2] = (TRPR(2)-BLPF(2));
+    // if (BC.Periodic[0]) DomSize[0] = (TRPR(0)-BLPF(0));
+    // if (BC.Periodic[1]) DomSize[1] = (TRPR(1)-BLPF(1));
+    // if (BC.Periodic[2]) DomSize[2] = (TRPR(2)-BLPF(2));
 
     // Initiate Head of Chain array for Linked-List
     HOC = new int**[(int) CellNo[0]];
@@ -219,27 +222,27 @@ inline void Domain::ListGenerate ()
 		break;
 	}
 
-	if (BC.Periodic[0]) {
-	   for(int j =0; j<CellNo[1]; j++)
-		   for(int k =0; k<CellNo[2]; k++) {
-			  HOC[CellNo[0]-1][j][k] =  HOC[1][j][k];
-			  HOC[CellNo[0]-2][j][k] =  HOC[0][j][k];
-		   }
-	} 
-	if (BC.Periodic[1]) {
-	   for(int i =0; i<CellNo[0]; i++)
-		   for(int k =0; k<CellNo[2]; k++) {
-			  HOC[i][CellNo[1]-1][k] =  HOC[i][1][k];
-			  HOC[i][CellNo[1]-2][k] =  HOC[i][0][k];
-		   }
-	}
-	if (BC.Periodic[2]) {
-	   for(int i =0; i<CellNo[0]; i++)
-		   for(int j =0; j<CellNo[1]; j++) {
-				  HOC[i][j][CellNo[2]-1] =  HOC[i][j][1];
-				  HOC[i][j][CellNo[2]-2] =  HOC[i][j][0];
-			   }
-	}
+	// if (BC.Periodic[0]) {
+	   // for(int j =0; j<CellNo[1]; j++)
+		   // for(int k =0; k<CellNo[2]; k++) {
+			  // HOC[CellNo[0]-1][j][k] =  HOC[1][j][k];
+			  // HOC[CellNo[0]-2][j][k] =  HOC[0][j][k];
+		   // }
+	// } 
+	// if (BC.Periodic[1]) {
+	   // for(int i =0; i<CellNo[0]; i++)
+		   // for(int k =0; k<CellNo[2]; k++) {
+			  // HOC[i][CellNo[1]-1][k] =  HOC[i][1][k];
+			  // HOC[i][CellNo[1]-2][k] =  HOC[i][0][k];
+		   // }
+	// }
+	// if (BC.Periodic[2]) {
+	   // for(int i =0; i<CellNo[0]; i++)
+		   // for(int j =0; j<CellNo[1]; j++) {
+				  // HOC[i][j][CellNo[2]-1] =  HOC[i][j][1];
+				  // HOC[i][j][CellNo[2]-2] =  HOC[i][j][0];
+			   // }
+	// }
 }
 
 inline void Domain::CellReset ()
@@ -332,13 +335,13 @@ inline void Domain::MainNeighbourSearch_CNS(const double &radius){
 inline void Domain::MainNeighbourSearch() {
     int q1;
 		//cout << "id free surf"<<id_free_surf<<endl;
-    if (BC.Periodic[0]) {
-	#pragma omp parallel for schedule (dynamic) num_threads(Nproc)
-	for (q1=1;q1<(CellNo[0]-1); q1++)	YZPlaneCellsNeighbourSearch(q1);
-    } else {
+    // if (BC.Periodic[0]) {
+	// #pragma omp parallel for schedule (dynamic) num_threads(Nproc)
+	// for (q1=1;q1<(CellNo[0]-1); q1++)	YZPlaneCellsNeighbourSearch(q1);
+    // } else {
 	#pragma omp parallel for schedule (dynamic) num_threads(Nproc)
     	for (q1=0;q1<CellNo[0]; q1++)	YZPlaneCellsNeighbourSearch(q1);
-    }
+    //}
 	m_isNbDataCleared = false;
 }
 
@@ -356,6 +359,7 @@ inline bool  Domain::CheckRadius(Particle* P1, Particle *P2){
 }
 
 inline void Domain::AllocateNbPair(const int &temp1, const int &temp2, const int &T){
+
 
 		int i,j;
 		if ( CheckRadius(Particles[temp1],Particles[temp2])){
