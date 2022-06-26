@@ -9,20 +9,20 @@ inline void Domain::CellInitiate () {
 	if (!(norm(TRPR)>0.0) && !(norm(BLPF)>0.0))
 	{
 		// Calculate Domain Size
-		BLPF = Particles[0]->x;
+		BLPF = x[0];
 		TRPR = Particles[0]->x;
 		hmax = Particles[0]->h;
 		rhomax = Particles[0]->Density;
 
-		for (size_t i=0; i<Particles.Size(); i++)
+		for (size_t i=0; i<particle_count; i++)
 		{
-			if (Particles[i]->x(0) > TRPR(0)) TRPR(0) = Particles[i]->x(0);
-			if (Particles[i]->x(1) > TRPR(1)) TRPR(1) = Particles[i]->x(1);
-			if (Particles[i]->x(2) > TRPR(2)) TRPR(2) = Particles[i]->x(2);
+			if (x[i](0) > TRPR(0)) TRPR(0) = x[i](0);
+			if (x[i](1) > TRPR(1)) TRPR(1) = x[i](1);
+			if (x[i](2) > TRPR(2)) TRPR(2) = x[i](2);
 
-			if (Particles[i]->x(0) < BLPF(0)) BLPF(0) = Particles[i]->x(0);
-			if (Particles[i]->x(1) < BLPF(1)) BLPF(1) = Particles[i]->x(1);
-			if (Particles[i]->x(2) < BLPF(2)) BLPF(2) = Particles[i]->x(2);
+			if (x[i](0) < BLPF(0)) BLPF(0) = x[i](0);
+			if (x[i](1) < BLPF(1)) BLPF(1) = x[i](1);
+			if (x[i](2) < BLPF(2)) BLPF(2) = x[i](2);
 
 			if (Particles[i]->h > hmax) hmax=Particles[i]->h;
 			if (Particles[i]->Density > rhomax) rhomax=Particles[i]->Density;
@@ -42,11 +42,14 @@ inline void Domain::CellInitiate () {
 
 	//Because of Hexagonal close packing in x direction domain is modified
 	//if (!BC.Periodic[0]) 
-  {TRPR(0) += hmax/2;	BLPF(0) -= hmax/2;}else{TRPR(0) += R; BLPF(0) -= R;}
+  {TRPR(0) += hmax/2;	BLPF(0) -= hmax/2;}
+//else{TRPR(0) += R; BLPF(0) -= R;}
 	//if (!BC.Periodic[1]) 
-  {TRPR(1) += hmax/2;	BLPF(1) -= hmax/2;}else{TRPR(1) += R; BLPF(1) -= R;}
+  {TRPR(1) += hmax/2;	BLPF(1) -= hmax/2;}
+//else{TRPR(1) += R; BLPF(1) -= R;}
 	//if (!BC.Periodic[2]) 
-  {TRPR(2) += hmax/2;	BLPF(2) -= hmax/2;}else{TRPR(2) += R; BLPF(2) -= R;}
+  {TRPR(2) += hmax/2;	BLPF(2) -= hmax/2;}
+//else{TRPR(2) += R; BLPF(2) -= R;}
 
     // Calculate Cells Properties
 	switch (Dimension)
@@ -132,29 +135,29 @@ inline void Domain::ListGenerate ()
 	int i, j, k, temp=0;
 	switch (Dimension)
 	{case 2:
-		for (size_t a=0; a<Particles.Size(); a++)
+		for (size_t a=0; a<particle_count; a++)
 		{
-			i= (int) (floor((Particles[a]->x(0) - BLPF(0)) / CellSize(0)));
-			j= (int) (floor((Particles[a]->x(1) - BLPF(1)) / CellSize(1)));
+			i= (int) (floor((x[a](0) - BLPF(0)) / CellSize(0)));
+			j= (int) (floor((x[a](1) - BLPF(1)) / CellSize(1)));
 
 			if (i<0)
             {
-                    if ((BLPF(0) - Particles[a]->x(0)) <= hmax) i=0;
+                    if ((BLPF(0) - x[a](0)) <= hmax) i=0;
                             else std::cout<<"Leaving i<0"<<std::endl;
             }
             if (j<0)
             {
-                    if ((BLPF(1) - Particles[a]->x(1)) <= hmax) j=0;
+                    if ((BLPF(1) - x[a](1)) <= hmax) j=0;
                             else std::cout<<"Leaving j<0"<<std::endl;
             }
 			if (i>=CellNo[0])
 			{
-					if ((Particles[a]->x(0) - TRPR(0)) <= hmax) i=CellNo[0]-1;
+					if ((x[a](0) - TRPR(0)) <= hmax) i=CellNo[0]-1;
 							else std::cout<<"Leaving i>=CellNo"<<std::endl;
 			}
             if (j>=CellNo[1])
             {
-                    if ((Particles[a]->x(1) - TRPR(1)) <= hmax) j=CellNo[1]-1;
+                    if ((x[a](1) - TRPR(1)) <= hmax) j=CellNo[1]-1;
                             else std::cout<<"Leaving j>=CellNo"<<std::endl;
             }
 
@@ -169,40 +172,40 @@ inline void Domain::ListGenerate ()
 		break;
 
 	case 3:
-		for (size_t a=0; a<Particles.Size(); a++)
+		for (size_t a=0; a<particle_count; a++)
 		{
-			i= (int) (floor((Particles[a]->x(0) - BLPF(0)) / CellSize(0)));
-			j= (int) (floor((Particles[a]->x(1) - BLPF(1)) / CellSize(1)));
-			k= (int) (floor((Particles[a]->x(2) - BLPF(2)) / CellSize(2)));
+			i= (int) (floor((x[a](0) - BLPF(0)) / CellSize(0)));
+			j= (int) (floor((x[a](1) - BLPF(1)) / CellSize(1)));
+			k= (int) (floor((x[a](2) - BLPF(2)) / CellSize(2)));
 
             if (i<0) i = 0;
             // {
-                    // if ((BLPF(0) - Particles[a]->x(0))<=hmax) i=0;
+                    // if ((BLPF(0) - x[a](0))<=hmax) i=0;
                             // else std::cout<<"Leaving, particle "<<a<< "yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
             if (j<0) j = 0 ;
             // {
-                    // if ((BLPF(1) - Particles[a]->x(1))<=hmax) j=0;
+                    // if ((BLPF(1) - x[a](1))<=hmax) j=0;
                             // else std::cout<<"Leaving particle "<<a<<"yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
             if (k<0) k = 0;
             // {
-                    // if ((BLPF(2) - Particles[a]->x(2))<=hmax) k=0;
+                    // if ((BLPF(2) - x[a](2))<=hmax) k=0;
                             // else std::cout<<"Leaving particle"<< a << "yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
 			if (i>=CellNo[0])i=CellNo[0]-1;
 			// {
-					// if ((Particles[a]->x(0) - TRPR(0))<=hmax) i=CellNo[0]-1;
+					// if ((x[a](0) - TRPR(0))<=hmax) i=CellNo[0]-1;
 							// else std::cout<<"Leavin particle "<<a<< "yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
 			// }
             if (j>=CellNo[1])j=CellNo[1]-1;
             // {
-                    // if ((Particles[a]->x(1) - TRPR(1))<=hmax) j=CellNo[1]-1;
+                    // if ((x[a](1) - TRPR(1))<=hmax) j=CellNo[1]-1;
                             // else std::cout<<"Leaving particle "<<a<<"yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
             if (k>=CellNo[2])k=CellNo[2]-1;
             // {
-                    // if ((Particles[a]->x(2) - TRPR(2))<=hmax) k=CellNo[2]-1;
+                    // if ((x[a](2) - TRPR(2))<=hmax) k=CellNo[2]-1;
                             // else std::cout<<"Leaving particle"<<a<<"yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
 
@@ -260,9 +263,9 @@ inline void Domain::CellReset ()
     }
 	#pragma omp parallel for schedule(static) num_threads(Nproc)
 	#ifdef __GNUC__
-	for (size_t a=0; a<Particles.Size(); a++)	//Like in Domain::Move
+	for (size_t a=0; a<particle_count; a++)	//Like in Domain::Move
 	#else
-	for (int a=0; a<Particles.Size(); a++)//Like in Domain::Move
+	for (int a=0; a<particle_count; a++)//Like in Domain::Move
 	#endif
 	{
 
@@ -279,7 +282,7 @@ inline void Domain::MainNeighbourSearch_CNS(const double &radius){
   std::vector<std::array<Real, 3>> positions;
 
 
-	for (unsigned int p = 0; p < Particles.Size(); p++){
+	for (unsigned int p = 0; p < particle_count; p++){
 		
 		std::array<Real, 3> x = {{
 			static_cast<Real>(Particles[p]->x[0]),
@@ -461,8 +464,8 @@ inline void Domain::ClearNbData(){
 }
 
 inline void Domain::SaveNeighbourData(){
-		std::vector <int> nb(Particles.Size());
-		std::vector <int> contnb(Particles.Size());
+		std::vector <int> nb(particle_count);
+		std::vector <int> contnb(particle_count);
 
 	#pragma omp parallel for schedule (static) num_threads(Nproc)
 	#ifdef __GNUC__
@@ -488,7 +491,7 @@ inline void Domain::SaveNeighbourData(){
 		// }
 
 	#pragma omp parallel for schedule (static) num_threads(Nproc)		
-	for (int p=0;p<Particles.Size();p++){
+	for (int p=0;p<particle_count;p++){
 		omp_set_lock(&Particles[p]->my_lock);
 		Particles[p]->Nb = nb[p];
 		omp_unset_lock(&Particles[p]->my_lock);
@@ -496,8 +499,8 @@ inline void Domain::SaveNeighbourData(){
 }
 
 inline void Domain::SaveContNeighbourData(){
-		std::vector <int> nb(Particles.Size());
-		std::vector <int> contnb(Particles.Size());
+		std::vector <int> nb(particle_count);
+		std::vector <int> contnb(particle_count);
 
 		for ( size_t k = 0; k < Nproc ; k++) {
 			for (size_t a=0; a<ContPairs[k].Size();a++) {//Same Material Pairs, Similar to Domain::LastComputeAcceleration ()
@@ -508,14 +511,14 @@ inline void Domain::SaveContNeighbourData(){
 			}			
 		}
 		
-		for (int p=0;p<Particles.Size();p++){
+		for (int p=0;p<particle_count;p++){
 			if (p < first_fem_particle_idx[0])
 				Particles[p]->ContNb = contnb[p];
 		}
 }
 
 int Domain::AvgNeighbourCount(){	
-		std::vector<int> nbcount(Particles.Size());
+		std::vector<int> nbcount(particle_count);
 		
 		#pragma omp parallel for schedule (static) num_threads(Nproc)
 		for (int p=0;p<Nproc;p++)
@@ -527,7 +530,7 @@ int Domain::AvgNeighbourCount(){
 		for (int p=0;p<nbcount.size();p++)
 		tot+=nbcount[p];
 	
-	return tot/Particles.Size();
+	return tot/particle_count;
 
 }
 
@@ -541,7 +544,7 @@ inline void Domain::CalcPairPosList(){                             //Calculate p
   
   #pragma omp parallel for schedule (static) num_threads(Nproc)
   for (int p=0;p<Nproc;p++){
-    for (int i=0;i<Particles.Size();i++){
+    for (int i=0;i<particle_count;i++){
       ipl_SM[p][i] = icount[p];
       icount[p]    += ipair_SM[p][i];
       jpl_SM[p][i] = jcount[p];
@@ -572,7 +575,7 @@ inline void Domain::CalcPairPosList(){                             //Calculate p
 inline void Domain::CalcRefTable(){
   #pragma omp parallel for schedule (static) num_threads(Nproc)
   for (int p=0;p<Nproc;p++){
-    for (int i = 0;i<Particles.Size();i++){
+    for (int i = 0;i<particle_count;i++){
     size_t T = omp_get_thread_num();
       for (int n=0;n<ipl_SM[T][i];n++){
         //Aref = ipl_SM

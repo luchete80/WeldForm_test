@@ -9,10 +9,10 @@ inline void Domain::CalcAccel() {
   
 	#pragma omp parallel for schedule (static) num_threads(Nproc)
 	{
-  for (size_t p=0; p<particle_count;p++) {
+  for (size_t i = 0; i < particle_count; i++) {
     
-    double h	= ( h[i]+ h[j])/2;
-    Vec3_t xij	= P1->x[i] - P2->x[j];
+    double h	= ( m_h[i]+ m_h[j])/2;
+    Vec3_t xij	= m_x[i] - m_x[j];
 
     double rij	= norm(xij);
     
