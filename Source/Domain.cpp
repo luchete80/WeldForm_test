@@ -116,13 +116,6 @@ inline Domain::~Domain ()
 	// for (size_t i=1; i<=Max; i++)  Particles.DelItem(Max-i);
 }
 
-inline void Domain::Periodic_X_Correction(Vec3_t & x, double const & h, Particle * P1, Particle * P2)
-{
-	if (DomSize(0)>0.0) {if (x(0)>2*Cellfac*h || x(0)<-2*Cellfac*h) {(P1->CC[0]>P2->CC[0]) ? x(0) -= DomSize(0) : x(0) += DomSize(0);}}
-	if (DomSize(1)>0.0) {if (x(1)>2*Cellfac*h || x(1)<-2*Cellfac*h) {(P1->CC[1]>P2->CC[1]) ? x(1) -= DomSize(1) : x(1) += DomSize(1);}}
-	if (DomSize(2)>0.0) {if (x(2)>2*Cellfac*h || x(2)<-2*Cellfac*h) {(P1->CC[2]>P2->CC[2]) ? x(2) -= DomSize(2) : x(2) += DomSize(2);}}
-}
-
 inline void Domain::Kernel_Set(Kernels_Type const & KT)
 {
 	KernelType = KT;
@@ -235,6 +228,9 @@ inline void Domain::AddCylinderLength(int tag, Vec3_t const & V, double Rxy, dou
 	int xinc,yinc,yinc_sign;
 	
 	int id_part=0;
+  
+  std::vector <Vec3_t> x;
+  std::vector <double> dens;
 	
   if (Dimension==3) {
 		int part_per_row = 0;
@@ -249,6 +245,7 @@ inline void Domain::AddCylinderLength(int tag, Vec3_t const & V, double Rxy, dou
 		}
 		cout << "Particle Row count: "<< k << endl;
 		int last_nonghostrow = k;
+    //Allocate
 		
 		k = 0;zp = V(2)/*+r*/;
 
@@ -269,7 +266,9 @@ inline void Domain::AddCylinderLength(int tag, Vec3_t const & V, double Rxy, dou
 				for (i=0; i<2*numxpart;i++) {
 					//if (random) Particles.Push(new Particle(tag,Vec3_t((x + qin*r*double(rand())/RAND_MAX),(y+ qin*r*double(rand())/RAND_MAX),(z+ qin*r*double(rand())/RAND_MAX)),Vec3_t(0,0,0),0.0,Density,h,Fixed));
 					//	else    
-					Particles.Push(new Particle(tag,Vec3_t(xp,yp,zp),Vec3_t(0,0,0),0.0,Density,h,Fixed));
+					//Particles.Push(new Particle(tag,Vec3_t(xp,yp,zp),Vec3_t(0,0,0),0.0,Density,h,Fixed));
+          x.push_back(Vec3_t(xp,yp,zp));
+          dens.push_back(Density);
 					if (zp == V(2))
 						part_per_row++;
 					id_part++;
@@ -286,21 +285,25 @@ inline void Domain::AddCylinderLength(int tag, Vec3_t const & V, double Rxy, dou
       zp += 2.*r;
 		}
 		cout << "Particles per row: "<<part_per_row<<endl;
+    
+    m_x  = new Vec3_t [x.size()];
 	
 		double Vol = M_PI * Rxy * Rxy * Lz;		
 		//double Mass = Vol * Density / (Particles.Size()-PrePS);
-		double Mass = Vol * Density /Particles.Size();
+		double Mass = Vol * Density /x.size();
 		
 		cout << "Total Particle count: " << Particles.Size() <<endl;
 		cout << "Particle mass: " << Mass <<endl;
 
 		#pragma omp parallel for num_threads(Nproc)
 		#ifdef __GNUC__
-		for (size_t i=0; i<Particles.Size(); i++)	//Like in Domain::Move
+		for (size_t i=0; i<x.size(); i++)	//Like in Domain::Move
 		#else
-		for (int i=0; i<Particles.Size(); i++)//Like in Domain::Move
+		for (int i=0; i<x.size(); i++)//Like in Domain::Move
 		#endif
 		{
+      m_x[i]    = x[i];
+      m_rho[i]  =dens[i]
 			Particles[i]->Mass = Mass;
 		}
 
@@ -319,14 +322,11 @@ inline void Domain::MoveGhost(){
 		//See normal direction, if it is vertical
     // tg axis is the same speed
 		Particles[gi]-> v  = Particles[i]-> v;
-		Particles[gi]-> va = Particles[i]-> va;
-		Particles[gi]-> vb = Particles[i]-> vb;
     
     int axis = Particles[gi]-> ghost_plane_axis;
     
 		Particles[gi]-> v[axis]  = - Particles[i]-> v[axis];
-		Particles[gi]-> va[axis] = - Particles[i]-> va[axis];
-		Particles[gi]-> vb[axis] = - Particles[i]-> vb[axis];
+
 
 		Particles[gi]-> a = 0.; //TO NOT INFLUENCE TIME STEP
 		
