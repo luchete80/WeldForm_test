@@ -21,7 +21,7 @@
 
 #include "Domain.h"
 #include "InteractionAlt.cpp"
-
+ 
 #define TAU		0.005
 #define VMAX	10.0
 

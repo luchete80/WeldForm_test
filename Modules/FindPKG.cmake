@@ -48,7 +48,7 @@ ADD_DEFINITIONS(-fmessage-length=0) # Each error message will appear on a single
 #ADD_DEFINITIONS(-std=c++11)         # New C++ standard
 ADD_DEFINITIONS(-fpermissive)       # New C++ standard
 
-INCLUDE      ($ENV{SPH}/Modules/FindHDF5.cmake)
+INCLUDE      ($ENV{TSTSPH}/Modules/FindHDF5.cmake)
 INCLUDE      (FindOpenMP)
 INCLUDE      (FindLAPACK)
 
@@ -58,7 +58,7 @@ IF(NOT ${GSL_Glob} MATCHES "NOTFOUND" )
 	INCLUDE      (FindGSL)
 ENDIF(NOT ${GSL_Glob} MATCHES "NOTFOUND")
 
-INCLUDE_DIRECTORIES($ENV{SPH}/Source $ENV{SPH}/External $ENV{PKG}/blitz-0.9)
+INCLUDE_DIRECTORIES($ENV{TSTSPH}/Source $ENV{TSTSPH}/External $ENV{PKG}/blitz-0.9)
 
 if(HDF5_FOUND)
         ADD_DEFINITIONS (-DH5_NO_DEPRECATED_SYMBOLS -DH5Gcreate_vers=2 -DH5Gopen_vers=2 -DUSE_HDF5)
@@ -82,7 +82,7 @@ endif(OPENMP_FOUND)
 if(LAPACK_FOUND)
     SET (LIBS ${LIBS} ${LAPACK_LIBRARIES})
 else(LAPACK_FOUND)
-     INCLUDE ($ENV{SPH}/Modules/FindLocLAPACK.cmake)
+     INCLUDE ($ENV{TSTSPH}/Modules/FindLocLAPACK.cmake)
     if(LocLAPACK_FOUND)
         SET (LIBS ${LIBS} ${LocLAPACK_LIBRARIES} "gfortran")
     else(LocLAPACK_FOUND)
@@ -95,7 +95,7 @@ if(GSL_FOUND)
 	INCLUDE_DIRECTORIES (${GSL_INCLUDE_DIRS})
 	SET (LIBS ${LIBS} ${GSL_LIBRARIES})
 else(GSL_FOUND)
-     INCLUDE ($ENV{SPH}/Modules/FindLocGSL.cmake)
+     INCLUDE ($ENV{TSTSPH}/Modules/FindLocGSL.cmake)
     if(LocGSL_FOUND)
 	INCLUDE_DIRECTORIES (${LocGSL_INCLUDE_DIRS})
         SET (LIBS ${LIBS} ${LocGSL_LIBRARIES})

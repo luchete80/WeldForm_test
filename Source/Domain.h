@@ -1,9 +1,39 @@
 
+#ifndef SPH_DOMAIN_H
+#define SPH_DOMAIN_H
+#include <stdio.h>    // for NULL
+#include <algorithm>  // for min,max
+
+#include <hdf5.h>
+#include <hdf5_hl.h>
+
+#include <omp.h>
+
+#include "Functions.h"
+//#include "Boundary_Condition.h"
+#include "matvec.h"
+#include "Functions.h"
+
+//#ifdef _WIN32 /* __unix__ is usually defined by compilers targeting Unix systems */
+#include <sstream>
+//#endif
+#include <sstream>
+#include <string>
+#include <cmath>
+
+#include <vector>
+
+//C++ Enum used for easiness of coding in the input files
+enum Kernels_Type { Qubic_Spline=0, Quintic=1, Quintic_Spline=2 ,Hyperbolic_Spline=3};
+enum Viscosity_Eq_Type { Morris=0, Shao=1, Incompressible_Full=2, Takeda=3 };
+enum Gradient_Type { Squared_density=0, Multiplied_density=1 };
+
+namespace SPH{
 class Domain
 {
 public:
-	typedef void (*PtVel) (Vec3_t & position, Vec3_t & Vel, double & Den, Boundary & bdry);
-	typedef void (*PtOut) (Particle * Particles, double & Prop1, double & Prop2,  double & Prop3);
+
+
 	typedef void (*PtDom) (Domain & dom);
     // Constructor
     Domain();
@@ -55,7 +85,7 @@ public:
     void StartAcceleration					(Vec3_t const & a = Vec3_t(0.0,0.0,0.0));	//Add a fixed acceleration such as the Gravity
     void PrimaryComputeAcceleration	();									//Compute the solid boundary properties
     void LastComputeAcceleration		();									//Compute the acceleration due to the other particles
-    void CalcForce2233	(Particle * P1, Particle * P2);		//Calculates the contact force between soil-soil/solid-solid particles
+    //void CalcForce2233	(Particle * P1, Particle * P2);		//Calculates the contact force between soil-soil/solid-solid particles
     void CalcAccel();		//NEW, ONLY CALCULATES ACCELERATION; IN ORDER TO ALTERNATE AND NOT CALCULATE Density at same place
     void CalcRateTensorsDens();		//NEW, ONLY CALCULATES ACCELERATION; IN ORDER TO ALTERNATE AND NOT CALCULATE Density at same place
     void CalcDensInc();
@@ -113,39 +143,11 @@ public:
 	const double & getStepSize()const {return deltat;};
 
 	
-	
-	/////////////////////// CONTACT /////////////////////////////
-	void AddTrimeshParticles(TriMesh *mesh, const float &hfac, const int &id);
-  void CalculateSurface(const int &id = 1);
-	inline void CalcContactForces();
-  inline void CalcContactForcesAnalytic();
-  inline void CalcContactForces2(); //Position criteria
-  inline void CalcContactInitialGap();
-  inline void UpdateContactParticles();  //Update position, velocity and normals FROM MESH
-  
-  
   //////////////////////////// ENERGY
   double kin_energy_sum, int_energy_sum;
   double mass_scaling_factor;
   
   bool contact_mesh_auto_update;
-  inline void ContactNbSearch();	//Performed AFTER neighbour search
-	std::vector<int> contact_surf_id;						//particles id from surface
-
-	double contact_force_factor;
-	double friction;
-  double friction_sta, friction_dyn;
-  // double friction_sta;
-  // double friction_kin;
-  Friction_Type fric_type;
-  
-  //Profiler things
-  double m_contact_forces_time;
-  double m_clock_begin;
-  double m_forces_artifvisc_time;
-  double m_forces_momentum_time;
-  double m_forces_tensors_time;
-  double m_forces_update_time;
 	
   int ts_nb_inc;
   
@@ -157,7 +159,7 @@ public:
 	/////////////// MEMBERS //
     // Data
 	//    std::vector< *Particle >				Particles; 	///< Array of particles
-	Array <Particle*>				Particles; 	///< Array of particles
+	//Array <Particle*>				Particles; 	///< Array of particles
     double					R;		///< Particle Radius in addrandombox
 
 		double					sqrt_h_a;				//Coefficient for determining Time Step based on acceleration (can be defined by user)
@@ -191,9 +193,7 @@ public:
     bool					FSI;						///< Selecting variable to choose Fluid-Structure Interaction
 		int						contact_type;		//0: no contact 1: node to surface 2: node 2 node
 		bool					thermal_solver;
-    
-   std::vector <boundaryCondition> bConds;  //NEW, For BCond
-	
+
 	// BONET KERNEL CORRECTION
 	bool 					gradKernelCorr;	
 	
@@ -209,11 +209,9 @@ public:
 	int						Nproc;
 	#endif
 	omp_lock_t 					dom_lock;	///< Open MP lock to lock Interactions array
-    Boundary					BC;
-    PtOut					UserOutput;
-    PtVel 					InCon;
-    PtVel 					OutCon;
-    PtVel 					AllCon;
+    //Boundary					BC;
+    //PtOut					UserOutput;
+
     Vec3_t					DomMax;
     Vec3_t					DomMin;
     PtDom					GeneralBefore;	///< Pointer to a function: to modify particles properties before CalcForce function
@@ -250,7 +248,7 @@ public:
 	bool					m_isNbDataCleared;
 	bool						auto_ts;				//LUCIANO: Auto Time Stepping
 	
-  std::vector <TriMesh*> trimesh; //ORIGINALLY
+
 	//CONTACT 
 	double PFAC, DFAC;		// Penalty and damping factors
 	bool 		contact;
@@ -283,8 +281,8 @@ public:
   inline void CheckMinTSVel();
   int AssignZone(Vec3_t &start, Vec3_t &end, int &id);
 	private:
-		bool  Domain::CheckRadius(Particle* P1, Particle *P2);
-		void Periodic_X_Correction	(Vec3_t & x, double const & h, Particle * P1, Particle * P2);		//Corrects xij for the periodic boundary condition
+
+
 		void AdaptiveTimeStep				();		//Uses the minimum time step to smoothly vary the time step
     
 
@@ -316,11 +314,10 @@ public:
 
 }; // namespace SPH
 
-#include "Interaction.cpp"
 #include "Domain.cpp"
 #include "KickDriftSolver.cpp"
 #include "Neighbour.cpp"
-#include "Output.cpp"
+//#include "Output.cpp"
 
 
 #endif // SPH_DOMAIN_H
