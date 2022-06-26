@@ -60,7 +60,7 @@ public:
     void CalcRateTensorsDens();		//NEW, ONLY CALCULATES ACCELERATION; IN ORDER TO ALTERNATE AND NOT CALCULATE Density at same place
     void CalcDensInc();
     void CalcRateTensors();
-    void CalcForceSOA(int &i,int &j) ;
+
     void Move						(double dt);										//Move particles
 
     void Solve					(double tf, double dt, double dtOut, char const * TheFileKey, size_t maxidx);		///< The solving function
