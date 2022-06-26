@@ -287,12 +287,14 @@ inline void Domain::AddCylinderLength(int tag, Vec3_t const & V, double Rxy, dou
 		cout << "Particles per row: "<<part_per_row<<endl;
     
     m_x  = new Vec3_t [x.size()];
-	
+    m_v  = new Vec3_t [x.size()];	
+    m_a  = new Vec3_t [x.size()];
+
 		double Vol = M_PI * Rxy * Rxy * Lz;		
 		//double Mass = Vol * Density / (Particles.Size()-PrePS);
 		double Mass = Vol * Density /x.size();
-		
-		cout << "Total Particle count: " << Particles.Size() <<endl;
+		particle_count = x.size();
+		cout << "Total Particle count: " << x.size() <<endl;
 		cout << "Particle mass: " << Mass <<endl;
 
 		#pragma omp parallel for num_threads(Nproc)
@@ -303,34 +305,14 @@ inline void Domain::AddCylinderLength(int tag, Vec3_t const & V, double Rxy, dou
 		#endif
 		{
       m_x[i]    = x[i];
-      m_rho[i]  =dens[i]
-			Particles[i]->Mass = Mass;
+      m_rho[i]  = dens[i];
+      m_mass[i] = Mass;
+			//Particles[i]->Mass = Mass;
 		}
 
 	}//Dim 3
 
 	R = r;
-}
-
-inline void Domain::MoveGhost(){
-
-	for (int gp=0; gp<GhostPairs.Size(); gp++){
-		int  i = GhostPairs[gp].first;
-		int gi = GhostPairs[gp].second;
-		
-    //ASSUMING SYMMETRY
-		//See normal direction, if it is vertical
-    // tg axis is the same speed
-		Particles[gi]-> v  = Particles[i]-> v;
-    
-    int axis = Particles[gi]-> ghost_plane_axis;
-    
-		Particles[gi]-> v[axis]  = - Particles[i]-> v[axis];
-
-
-		Particles[gi]-> a = 0.; //TO NOT INFLUENCE TIME STEP
-		
-	}
 }
 
 

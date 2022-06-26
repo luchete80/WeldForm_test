@@ -266,11 +266,14 @@ public:
 	Vec3_t *m_x,*m_v,*m_a;
 	double *m_h;
 	double *m_rho, *m_mass;
+  double *m_u;
+  int particle_count;
   //Mechanics
   double *sigma;
 	double *strrate,*rotrate;//all flattened, six component (rotation rate is upped matrix component, since it is antisymm)
 	double *shearstress,*shearstressa,*shearstressb;
 	double *strain,*straina,*strainb;
+  double *pl_strain;
 	
   //////////////////////// NEW: IMPLICIT SOLVER FOR QUASI STATIC 
   inline void InitImplicitSolver();
