@@ -160,7 +160,7 @@ SET(EXES
 	#"Source/WeldForm"
 )
 
-add_subdirectory("examples")
+#add_subdirectory("examples")
 
 FOREACH(var ${EXES})
     ADD_EXECUTABLE        (${var} "${var}.cpp" 
@@ -169,10 +169,3 @@ FOREACH(var ${EXES})
     TARGET_LINK_LIBRARIES (${var} ${LIBS} blitz)
     SET_TARGET_PROPERTIES (${var} PROPERTIES COMPILE_FLAGS "${FLAGS}" LINK_FLAGS "${LFLAGS}")
 ENDFOREACH(var)
-
-ADD_EXECUTABLE        (WeldForm "${PROJECT_SOURCE_DIR}/Source/WeldForm.cpp" )
-TARGET_LINK_LIBRARIES (WeldForm ${LIBS} blitz)
-SET_TARGET_PROPERTIES (WeldForm PROPERTIES COMPILE_FLAGS "${FLAGS}" LINK_FLAGS "${LFLAGS}")	
-    # ADD_EXECUTABLE        (${EXES} "Plate-Yield.cpp")
-    # TARGET_LINK_LIBRARIES (${EXES} ${LIBS} blitz)
-    # SET_TARGET_PROPERTIES (${EXES} PROPERTIES COMPILE_FLAGS "${FLAGS}" LINK_FLAGS "${LFLAGS}")
