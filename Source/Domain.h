@@ -229,6 +229,8 @@ public:
 		
     Array<Array<std::pair<size_t,size_t> > >	ContPairs;
     
+    std::vector <int> neib;         //THIS IS FOR EACH PARTICLE 
+    
     //NEW: For parallel sum/reduction
     Array< Array <size_t> > ilist_SM,jlist_SM;          // Size [Proc][Pairs] i and j particles of pair list [l]
     std::vector < std::vector <size_t> > ipair_SM,jpair_SM; //[Proc][Particles]// This is nb count for each particle i<j and j>i
