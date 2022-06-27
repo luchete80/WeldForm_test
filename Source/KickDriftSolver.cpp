@@ -157,13 +157,13 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
     #pragma omp parallel for schedule (static) private(du) num_threads(Nproc)
     for (size_t i=0; i<particle_count; i++){
       du = (m_v[i] /*+ Particles[i]->VXSPH*/)*deltat*factor;
-      Particles[i]->Displacement += du;
-      Particles[i]->x += du;
+      m_u[i] += du;
+      m_x[i] += du;
     }
 
     #pragma omp parallel for schedule (static) num_threads(Nproc)
     for (size_t i=0; i<particle_count; i++){
-      Particles[i]->v += Particles[i]->a*deltat/2.*factor;
+      v[i] += a[i]*deltat/2.*factor;
       //Particles[i]->LimitVel();
     }
     MoveGhost();

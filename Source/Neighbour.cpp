@@ -9,20 +9,20 @@ inline void Domain::CellInitiate () {
 	if (!(norm(TRPR)>0.0) && !(norm(BLPF)>0.0))
 	{
 		// Calculate Domain Size
-		BLPF = x[0];
-		TRPR = Particles[0]->x;
+		BLPF = m_x[0];
+		TRPR = m_x[0];
 		hmax = Particles[0]->h;
-		rhomax = Particles[0]->Density;
+		rhomax = m_rho[0];
 
 		for (size_t i=0; i<particle_count; i++)
 		{
-			if (x[i](0) > TRPR(0)) TRPR(0) = x[i](0);
-			if (x[i](1) > TRPR(1)) TRPR(1) = x[i](1);
-			if (x[i](2) > TRPR(2)) TRPR(2) = x[i](2);
+			if (m_x[i](0) > TRPR(0)) TRPR(0) = m_x[i](0);
+			if (m_x[i](1) > TRPR(1)) TRPR(1) = m_x[i](1);
+			if (m_x[i](2) > TRPR(2)) TRPR(2) = m_x[i](2);
 
-			if (x[i](0) < BLPF(0)) BLPF(0) = x[i](0);
-			if (x[i](1) < BLPF(1)) BLPF(1) = x[i](1);
-			if (x[i](2) < BLPF(2)) BLPF(2) = x[i](2);
+			if (m_x[i](0) < BLPF(0)) BLPF(0) = m_x[i](0);
+			if (m_x[i](1) < BLPF(1)) BLPF(1) = m_x[i](1);
+			if (m_x[i](2) < BLPF(2)) BLPF(2) = m_x[i](2);
 
 			if (Particles[i]->h > hmax) hmax=Particles[i]->h;
 			if (Particles[i]->Density > rhomax) rhomax=Particles[i]->Density;
@@ -137,27 +137,27 @@ inline void Domain::ListGenerate ()
 	{case 2:
 		for (size_t a=0; a<particle_count; a++)
 		{
-			i= (int) (floor((x[a](0) - BLPF(0)) / CellSize(0)));
-			j= (int) (floor((x[a](1) - BLPF(1)) / CellSize(1)));
+			i= (int) (floor((m_x[a](0) - BLPF(0)) / CellSize(0)));
+			j= (int) (floor((m_x[a](1) - BLPF(1)) / CellSize(1)));
 
 			if (i<0)
             {
-                    if ((BLPF(0) - x[a](0)) <= hmax) i=0;
+                    if ((BLPF(0) - m_x[a](0)) <= hmax) i=0;
                             else std::cout<<"Leaving i<0"<<std::endl;
             }
             if (j<0)
             {
-                    if ((BLPF(1) - x[a](1)) <= hmax) j=0;
+                    if ((BLPF(1) - m_x[a](1)) <= hmax) j=0;
                             else std::cout<<"Leaving j<0"<<std::endl;
             }
 			if (i>=CellNo[0])
 			{
-					if ((x[a](0) - TRPR(0)) <= hmax) i=CellNo[0]-1;
+					if ((m_x[a](0) - TRPR(0)) <= hmax) i=CellNo[0]-1;
 							else std::cout<<"Leaving i>=CellNo"<<std::endl;
 			}
             if (j>=CellNo[1])
             {
-                    if ((x[a](1) - TRPR(1)) <= hmax) j=CellNo[1]-1;
+                    if ((m_x[a](1) - TRPR(1)) <= hmax) j=CellNo[1]-1;
                             else std::cout<<"Leaving j>=CellNo"<<std::endl;
             }
 
@@ -174,38 +174,38 @@ inline void Domain::ListGenerate ()
 	case 3:
 		for (size_t a=0; a<particle_count; a++)
 		{
-			i= (int) (floor((x[a](0) - BLPF(0)) / CellSize(0)));
-			j= (int) (floor((x[a](1) - BLPF(1)) / CellSize(1)));
-			k= (int) (floor((x[a](2) - BLPF(2)) / CellSize(2)));
+			i= (int) (floor((m_x[a](0) - BLPF(0)) / CellSize(0)));
+			j= (int) (floor((m_x[a](1) - BLPF(1)) / CellSize(1)));
+			k= (int) (floor((m_x[a](2) - BLPF(2)) / CellSize(2)));
 
             if (i<0) i = 0;
             // {
-                    // if ((BLPF(0) - x[a](0))<=hmax) i=0;
+                    // if ((BLPF(0) - m_x[a](0))<=hmax) i=0;
                             // else std::cout<<"Leaving, particle "<<a<< "yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
             if (j<0) j = 0 ;
             // {
-                    // if ((BLPF(1) - x[a](1))<=hmax) j=0;
+                    // if ((BLPF(1) - m_x[a](1))<=hmax) j=0;
                             // else std::cout<<"Leaving particle "<<a<<"yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
             if (k<0) k = 0;
             // {
-                    // if ((BLPF(2) - x[a](2))<=hmax) k=0;
+                    // if ((BLPF(2) - m_x[a](2))<=hmax) k=0;
                             // else std::cout<<"Leaving particle"<< a << "yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
 			if (i>=CellNo[0])i=CellNo[0]-1;
 			// {
-					// if ((x[a](0) - TRPR(0))<=hmax) i=CellNo[0]-1;
+					// if ((m_x[a](0) - TRPR(0))<=hmax) i=CellNo[0]-1;
 							// else std::cout<<"Leavin particle "<<a<< "yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
 			// }
             if (j>=CellNo[1])j=CellNo[1]-1;
             // {
-                    // if ((x[a](1) - TRPR(1))<=hmax) j=CellNo[1]-1;
+                    // if ((m_x[a](1) - TRPR(1))<=hmax) j=CellNo[1]-1;
                             // else std::cout<<"Leaving particle "<<a<<"yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
             if (k>=CellNo[2])k=CellNo[2]-1;
             // {
-                    // if ((x[a](2) - TRPR(2))<=hmax) k=CellNo[2]-1;
+                    // if ((m_x[a](2) - TRPR(2))<=hmax) k=CellNo[2]-1;
                             // else std::cout<<"Leaving particle"<<a<<"yield "<<Particles[a]->Sigmay<<", eff_str_rate "<<Particles[a]->eff_strain_rate<<std::endl;
             // }
 
@@ -285,9 +285,9 @@ inline void Domain::MainNeighbourSearch_CNS(const double &radius){
 	for (unsigned int p = 0; p < particle_count; p++){
 		
 		std::array<Real, 3> x = {{
-			static_cast<Real>(Particles[p]->x[0]),
-			static_cast<Real>(Particles[p]->x[1]),
-			static_cast<Real>(Particles[p]->x[2])
+			static_cast<Real>(Particles[p]->m_x[0]),
+			static_cast<Real>(Particles[p]->m_x[1]),
+			static_cast<Real>(Particles[p]->m_x[2])
 		}};
 		positions.push_back(x);
 
@@ -510,11 +510,7 @@ inline void Domain::SaveContNeighbourData(){
 				
 			}			
 		}
-		
-		for (int p=0;p<particle_count;p++){
-			if (p < first_fem_particle_idx[0])
-				Particles[p]->ContNb = contnb[p];
-		}
+
 }
 
 int Domain::AvgNeighbourCount(){	
