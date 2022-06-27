@@ -287,6 +287,7 @@ inline void Domain::AddCylinderLength(int tag, Vec3_t const & V, double Rxy, dou
 		cout << "Particles per row: "<<part_per_row<<endl;
     
     m_x  = new Vec3_t [x.size()];
+    m_u  = new Vec3_t [x.size()];
     m_v  = new Vec3_t [x.size()];	
     m_a  = new Vec3_t [x.size()];
 

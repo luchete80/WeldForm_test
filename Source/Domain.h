@@ -266,7 +266,7 @@ public:
 	Vec3_t *m_x,*m_v,*m_a;
 	double *m_h;
 	double *m_rho, *m_mass;
-  double *m_u;
+  Vec3_t *m_u;
   int particle_count;
   //Mechanics
   double *sigma;

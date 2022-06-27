@@ -74,8 +74,8 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
     Vec3_t max_disp = Vec3_t(0.,0.,0.);
 		for (int i=0; i<particle_count; i++){
       for (int j=0;j<3;j++)
-        if (Particles[i]->Displacement[j]>max_disp[j]){
-          max_disp[j] = Particles[i]->Displacement [j];
+        if (m_u[i](j)>max_disp[j]){
+          max_disp[j] = m_u[i](j);
           imax=i;
 			}
 		}
@@ -134,7 +134,7 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
     clock_beg = clock();
     #pragma omp parallel for schedule (static) num_threads(Nproc)
     for (size_t i=0; i<particle_count; i++){
-      Particles[i]->v += Particles[i]->a*deltat/2.*factor;
+      m_v[i] += m_a[i]*deltat/2.*factor;
       //Particles[i]->LimitVel();
     }
     MoveGhost();   
@@ -156,7 +156,7 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
     clock_beg = clock();   
     #pragma omp parallel for schedule (static) private(du) num_threads(Nproc)
     for (size_t i=0; i<particle_count; i++){
-      du = (Particles[i]->v + Particles[i]->VXSPH)*deltat*factor;
+      du = (m_v[i] /*+ Particles[i]->VXSPH*/)*deltat*factor;
       Particles[i]->Displacement += du;
       Particles[i]->x += du;
     }
