@@ -1,6 +1,6 @@
 
 // Not a particular integration scheme, only adding +dt
-inline void Domain::CalcStressStrain(double dt) {
+inline void Domain::CalcStressStrain(double &dt) {
 	Pressure = EOS(PresEq, Cs, P0,Density, RefDensity);
 
 	StrainRate 	  = FromFlatSym			        (strrate);

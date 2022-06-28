@@ -147,7 +147,7 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
     #pragma omp parallel for schedule (static) num_threads(Nproc)
     for (size_t i=0; i<particle_count; i++){
       //Particles[i]->UpdateDensity_Leapfrog(deltat);
-      m_rho[i] += deltat*Particles[i]->dDensity*factor;
+      m_rho[i] += deltat * m_drho[i]*factor;
     }    
     dens_time_spent+=(double)(clock() - clock_beg) / CLOCKS_PER_SEC;
     //BEFORE
@@ -163,7 +163,7 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
 
     #pragma omp parallel for schedule (static) num_threads(Nproc)
     for (size_t i=0; i<particle_count; i++){
-      v[i] += a[i]*deltat/2.*factor;
+      m_v[i] += m_a[i]*deltat/2.*factor;
       //Particles[i]->LimitVel();
     }
     MoveGhost();
@@ -174,8 +174,7 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
     CalcRateTensors();  //With v and xn+1
     #pragma omp parallel for schedule (static) num_threads(Nproc)
     for (size_t i=0; i<particle_count; i++){
-      //Particles[i]->Mat2Leapfrog(deltat); //Uses density  
-      Particles[i]->CalcStressStrain(deltat); //Uses density  
+      CalcStressStrain(deltat); //Uses density  
     } 
     stress_time_spent += (double)(clock() - clock_beg) / CLOCKS_PER_SEC;
 
@@ -202,11 +201,8 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
 				ts_i = 0;
 		
 		}
+
     
-    if (Particles[0]->FirstStep)
-    for (size_t i=0; i<particle_count; i++){
-      Particles[i]->FirstStep = false;
-    }
 		if (isfirst) isfirst = false;
 
 		if (Time>=tout){
@@ -242,13 +238,14 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
       
       ofprop <<getTime() << ", "<<m_scalar_prop<<endl;
 			
-      for (int p=0;p<particle_count;p++){
-				if (Particles[p]->print_history)
-          of << Particles[p]->Displacement << ", "<<Particles[p]->pl_strain<<", "<<Particles[p]->eff_strain_rate<<", "<< 
-          Particles[p]->Sigma_eq<<", "  <<  Particles[p]->Sigmay << ", " <<
-          contact_force_sum << endl;
-			}
+      // for (int p=0;p<particle_count;p++){
+				// if (Particles[p]->print_history)
+          // of << Particles[p]->Displacement << ", "<<Particles[p]->pl_strain<<", "<<Particles[p]->eff_strain_rate<<", "<< 
+          // Particles[p]->Sigma_eq<<", "  <<  Particles[p]->Sigmay << ", " <<
+          // contact_force_sum << endl;
+			// }
 		}
+    
     if (auto_ts){
       CheckMinTSVel();
       AdaptiveTimeStep();
@@ -257,8 +254,6 @@ inline void Domain::SolveDiffUpdateKickDrift (double tf, double dt, double dtOut
 	}
 
 
-	of.close(); //History 
-  ofprop.close(); //Scalar prop
 	
 	std::cout << "\n--------------Solving is finished---------------------------------------------------" << std::endl;
 

@@ -138,6 +138,7 @@ public:
 	inline void CalcPlasticWorkHeat();
 	inline void CalcGradCorrMatrix();	//BONET GRADIENT CORRECTION
 	inline void CalcGradCorrMixedMatrix();	//BONET GRADIENT CORRECTION
+  inline void CalcStressStrain(double &dt);
 	
 	inline void MoveGhost();
 	const double & getStepSize()const {return deltat;};
@@ -265,7 +266,7 @@ public:
 	/////////////////////// SOA (Since v0.4) ///////////////////////////////////
 	Vec3_t *m_x,*m_v,*m_a;
 	double *m_h;
-	double *m_rho, *m_mass;
+	double *m_rho, *m_mass, *m_drho;
   Vec3_t *m_u;
   int particle_count;
   //Mechanics

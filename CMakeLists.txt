@@ -26,7 +26,7 @@ add_definitions(-D_CRT_NO_VA_START_VALIDATION)
 
 add_definitions(-D_USE_MATH_DEFINES) #COMPACTNSEARCH??
 
-INCLUDE ($ENV{SPH}/Modules/FindPKG.cmake)
+INCLUDE ($ENV{TSTSPH}/Modules/FindPKG.cmake)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   # using Clang
