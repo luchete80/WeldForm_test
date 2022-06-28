@@ -75,7 +75,7 @@ public:
     void MainNeighbourSearch_CNS    (const double &r);  //NEW; ALLOWS TO SAVE DATA BY PARTICLE NBS (AND NOT LOCKING DOMAIN)
 		void MainNeighbourSearch_Ext		();									//Create pairs of particles in the whole domain
 		int AvgNeighbourCount						();									//Create pairs of particles in the whole domain
-    
+    bool CheckRadius(Vec3_t &x1, Vec3_t &x2);
     void CalcPairPosList();                             //Calculate position list for every particle ipl/jpl[NProc][particle]
     void CalcRefTable();
 		
